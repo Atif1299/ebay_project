@@ -254,7 +254,7 @@ export default function AdminPage() {
   // Purchase Credits State
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
 
-  const handlePurchase = async (credits: number, amount: number) => {
+  const handlePurchase = async (credits: number, amount: number, expiresInDays?: number) => {
     try {
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
@@ -262,7 +262,8 @@ export default function AdminPage() {
         body: JSON.stringify({
           amount,
           credits,
-          userId: user?.id
+          userId: user?.id,
+          expiresInDays
         })
       });
 
@@ -2798,54 +2799,59 @@ export default function AdminPage() {
         <AlertDialogContent className="sm:max-w-4xl bg-white p-0 overflow-hidden">
           <div className="p-8">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900">Research Credit Packs</h2>
-              <p className="text-gray-500 mt-2">Top up your account to fetch more items ($0.10/item)</p>
+              <h2 className="text-3xl font-bold text-cyan-500">Additional Research Credit Packs</h2>
+              <p className="text-gray-500 mt-2">Need more credits? Easily purchase additional research credits at a discount.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* STARTER */}
-              <div className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-200 bg-white flex flex-col items-center relative overflow-hidden group">
-                <div className="absolute top-0 w-full h-1 bg-blue-500 left-0"></div>
-                <h3 className="text-lg font-bold text-gray-900 uppercase tracking-wide mb-4">Starter</h3>
-                <div className="text-4xl font-extrabold text-gray-900 mb-2">$10</div>
-                <div className="text-blue-600 font-semibold mb-1">100 Credits</div>
-                <div className="text-sm text-gray-500 mb-6">30 day expiration</div>
-                <Button
-                  className="w-full mt-auto bg-gray-900 hover:bg-gray-800"
-                  onClick={() => handlePurchase(100, 10)}
-                  disabled={isSubmitting}
-                >
-                  Purchase
-                </Button>
-              </div>
-
-              {/* STANDARD */}
-              <div className="border border-purple-200 rounded-xl p-6 hover:shadow-lg transition-all duration-200 bg-purple-50/30 flex flex-col items-center relative overflow-hidden group">
-                <div className="absolute top-0 w-full h-1 bg-purple-500 left-0"></div>
-                <div className="absolute top-4 right-4 text-[10px] font-bold bg-purple-100 text-purple-700 px-2 py-1 rounded-full uppercase tracking-wider">Popular</div>
-                <h3 className="text-lg font-bold text-gray-900 uppercase tracking-wide mb-4">Standard</h3>
-                <div className="text-4xl font-extrabold text-gray-900 mb-2">$50</div>
-                <div className="text-purple-600 font-semibold mb-1">500 Credits</div>
-                <div className="text-sm text-gray-500 mb-6">90 day expiration</div>
-                <Button
-                  className="w-full mt-auto bg-purple-600 hover:bg-purple-700"
-                  onClick={() => handlePurchase(500, 50)}
-                  disabled={isSubmitting}
-                >
-                  Purchase
-                </Button>
-              </div>
-
-              {/* PRO */}
-              <div className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-200 bg-white flex flex-col items-center relative overflow-hidden group">
-                <div className="absolute top-0 w-full h-1 bg-emerald-500 left-0"></div>
-                <h3 className="text-lg font-bold text-gray-900 uppercase tracking-wide mb-4">Pro</h3>
-                <div className="text-4xl font-extrabold text-gray-900 mb-2">$100</div>
-                <div className="text-emerald-600 font-semibold mb-1">1000 Credits</div>
+              {/* BOOSTER */}
+              <div className="border-2 border-emerald-600 rounded-xl p-6 hover:shadow-lg transition-all duration-200 bg-white flex flex-col items-center relative overflow-hidden group">
+                <div className="absolute -left-8 top-6 bg-emerald-600 text-white text-sm font-bold py-1 px-10 transform -rotate-0 uppercase tracking-wide" style={{clipPath: 'polygon(0 0, 100% 0, 95% 100%, 0 100%)'}}>
+                  Booster
+                </div>
+                <div className="mt-8"></div>
+                <div className="text-4xl font-extrabold text-gray-900 mb-2">$49</div>
+                <div className="text-gray-700 font-semibold mb-1">100 Credits</div>
                 <div className="text-sm text-gray-500 mb-6 font-medium">Never Expire!</div>
                 <Button
-                  className="w-full mt-auto bg-gray-900 hover:bg-gray-800"
-                  onClick={() => handlePurchase(1000, 100)}
+                  className="w-full mt-auto bg-emerald-600 hover:bg-emerald-700 text-white"
+                  onClick={() => handlePurchase(100, 49)}
+                  disabled={isSubmitting}
+                >
+                  Purchase
+                </Button>
+              </div>
+
+              {/* GROWTH */}
+              <div className="border-2 border-emerald-400 rounded-xl p-6 hover:shadow-lg transition-all duration-200 bg-white flex flex-col items-center relative overflow-hidden group">
+                <div className="absolute -left-8 top-6 bg-emerald-400 text-white text-sm font-bold py-1 px-10 transform -rotate-0 uppercase tracking-wide" style={{clipPath: 'polygon(0 0, 100% 0, 95% 100%, 0 100%)'}}>
+                  Growth
+                </div>
+                <div className="mt-8"></div>
+                <div className="text-4xl font-extrabold text-gray-900 mb-2">$129</div>
+                <div className="text-gray-700 font-semibold mb-1">300 Credits!</div>
+                <div className="text-sm text-gray-500 mb-6 font-medium">Never Expire!</div>
+                <Button
+                  className="w-full mt-auto bg-emerald-400 hover:bg-emerald-500 text-white"
+                  onClick={() => handlePurchase(300, 129)}
+                  disabled={isSubmitting}
+                >
+                  Purchase
+                </Button>
+              </div>
+
+              {/* ENTERPRISE */}
+              <div className="border-2 border-emerald-700 rounded-xl p-6 hover:shadow-lg transition-all duration-200 bg-white flex flex-col items-center relative overflow-hidden group">
+                <div className="absolute -left-8 top-6 bg-emerald-700 text-white text-sm font-bold py-1 px-10 transform -rotate-0 uppercase tracking-wide" style={{clipPath: 'polygon(0 0, 100% 0, 95% 100%, 0 100%)'}}>
+                  Enterprise
+                </div>
+                <div className="mt-8"></div>
+                <div className="text-4xl font-extrabold text-gray-900 mb-2">$189</div>
+                <div className="text-gray-700 font-semibold mb-1">750 Credits!</div>
+                <div className="text-sm text-gray-500 mb-6 font-medium">Never Expire!</div>
+                <Button
+                  className="w-full mt-auto bg-emerald-700 hover:bg-emerald-800 text-white"
+                  onClick={() => handlePurchase(750, 189)}
                   disabled={isSubmitting}
                 >
                   Purchase

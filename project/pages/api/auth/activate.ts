@@ -89,8 +89,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               await databaseService.topUpCredits(user.id, credits, 'Provisioned via Activation', expiresInDays || null);
          } else {
               // Internal fallback if token doesn't have credits but they are eligible
+              // Default to 500 credits for all trial users (as per Paul's request)
               const creditSettings = await databaseService.getCreditSettings();
-              const initialCredits = typeof creditSettings.trial_credits === 'number' ? creditSettings.trial_credits : 3; // Default to 3 as requested
+              const initialCredits = typeof creditSettings.trial_credits === 'number' ? creditSettings.trial_credits : 500;
               console.log(`Applying system default ${initialCredits} trial credits to user ${email}`);
               await databaseService.createUserCredits(user.id, initialCredits);
          }
