@@ -11,7 +11,6 @@ import { Separator } from '@/components/ui/separator';
 // ... imports
 import { Loader2, User, Lock, Save, CheckCircle, AlertCircle } from 'lucide-react';
 import Navbar from '@/components/layout/navbar';
-import { dataStore } from '@/services/dataStore';
 import { toast } from 'sonner';
 
 export default function ProfilePage() {
@@ -57,13 +56,28 @@ export default function ProfilePage() {
     setIsLoadingProfile(true);
 
     try {
-      const updatedUser = await dataStore.updateUserProfile(user.id, profileForm);
-      if (updatedUser) {
+      console.log('Sending profile update request...');
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Include cookies for authentication
+        body: JSON.stringify(profileForm),
+      });
+
+      console.log('Profile response status:', response.status);
+      const data = await response.json();
+      console.log('Profile response data:', data);
+
+      if (response.ok && data.success) {
         toast.success('Profile updated successfully!');
-        // Update the auth context with new data
-        // Note: In a real app, you'd want to refresh the auth context
+        // Update localStorage with new user data
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
       } else {
-        toast.error('Failed to update profile');
+        toast.error(data.error || 'Failed to update profile');
       }
     } catch (err) {
       toast.error('An error occurred while updating profile');
@@ -90,13 +104,24 @@ export default function ProfilePage() {
     setIsLoadingPassword(true);
 
     try {
-      const success = await dataStore.changePassword(
-        user.id,
-        passwordForm.currentPassword,
-        passwordForm.newPassword
-      );
+      console.log('Sending password change request...');
+      const response = await fetch('/api/profile/password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Include cookies for authentication
+        body: JSON.stringify({
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword,
+        }),
+      });
 
-      if (success) {
+      console.log('Response status:', response.status);
+      const data = await response.json();
+      console.log('Response data:', data);
+
+      if (response.ok && data.success) {
         toast.success('Password changed successfully!');
         setPasswordForm({
           currentPassword: '',
@@ -104,7 +129,7 @@ export default function ProfilePage() {
           confirmPassword: ''
         });
       } else {
-        toast.error('Current password is incorrect');
+        toast.error(data.error || 'Current password is incorrect');
       }
     } catch (err) {
       toast.error('An error occurred while changing password');
