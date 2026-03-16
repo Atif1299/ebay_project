@@ -534,12 +534,22 @@ class DatabaseService {
     try {
         // First verify current password
         const userResult = await client.query('SELECT password FROM users WHERE id = $1', [id]);
-        if (userResult.rows.length === 0) return false;
+        console.log('User query result rows:', userResult.rows.length);
+        if (userResult.rows.length === 0) {
+          console.log('User not found with ID:', id);
+          return false;
+        }
 
         const storedHash = userResult.rows[0].password;
-        if (!storedHash) return false; // Should not happen
+        console.log('Stored password hash (first 20 chars):', storedHash ? storedHash.substring(0, 20) : 'NULL');
+        console.log('Is bcrypt hash:', storedHash ? storedHash.startsWith('$2') : false);
+        if (!storedHash) {
+          console.log('No password hash stored');
+          return false;
+        }
 
         const isMatch = await bcrypt.compare(currentPassword, storedHash);
+        console.log('Password match result:', isMatch);
         if (!isMatch) return false;
 
         // Hash new password
